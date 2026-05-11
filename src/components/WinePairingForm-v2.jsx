@@ -70,7 +70,7 @@ export default function WinePairingForm({ userId }) {
       let wineList = ''
 
       if (image) {
-        const visionResponse = await fetch('https://api.anthropic.com/v1/messages', {
+        const visionResponse = await fetch('/api/claude', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -139,7 +139,7 @@ NOTAS DE DEGUSTAÇÃO: [3-4 características principais do vinho]
 REGIÃO/ORIGEM: [Onde encontrar este vinho ou alternativas similares]`
 
       const recommendResponse = await fetch(
-        'https://api.anthropic.com/v1/messages',
+        '/api/claude',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

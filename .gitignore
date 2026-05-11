@@ -3,9 +3,12 @@ node_modules/
 package-lock.json
 yarn.lock
 
-# Environment variables
+# Environment variables (NUNCA commitar credenciais!)
 .env
 .env.local
+.env.development
+.env.test
+.env.production
 .env.*.local
 
 # Build outputs

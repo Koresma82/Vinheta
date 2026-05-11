@@ -1,10 +1,32 @@
+# ============================================
+# NETLIFY CONFIG - VINHETA
+# MAIN  → PROD (Firebase: vinheta-3dd20)
+# TEST  → TEST (Firebase: vinhetatest)
+# DEV   → só local (Firebase: vinhetadev)
+# ============================================
+
+# --- PRODUÇÃO (branch: main) ---
 [build]
   command = "npm run build"
-  functions = "netlify/functions"
   publish = "dist"
 
 [build.environment]
   NODE_VERSION = "18"
+  VITE_ENVIRONMENT = "production"
+
+# --- TEST (branch: test) ---
+[context.test]
+  command = "npm run build"
+  publish = "dist"
+
+[context.test.environment]
+  VITE_ENVIRONMENT = "test"
+
+# --- SPA redirect ---
+[[redirects]]
+  from = "/api/claude"
+  to = "/.netlify/functions/claude-proxy"
+  status = 200
 
 [[redirects]]
   from = "/*"
@@ -16,5 +38,4 @@
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
