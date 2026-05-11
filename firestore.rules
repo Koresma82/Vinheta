@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===== UTILIZADORES NORMAIS =====
+    // Cada utilizador só acede aos seus próprios dados
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ===== REGISTO / APROVAÇÃO =====
+    // Qualquer utilizador autenticado pode criar/ler o seu próprio registo
+    // Só o SuperAdmin pode ler todos e atualizar status
+    match /registo_utilizadores/{userId} {
+      // Utilizador cria o seu próprio registo
+      allow create: if request.auth != null && request.auth.uid == userId;
+
+      // Utilizador lê o seu próprio status
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // SuperAdmin lê e atualiza qualquer registo
+      allow read, write: if request.auth != null
+        && request.auth.token.email == 'koresma@mailbox.org';
+    }
+  }
+}

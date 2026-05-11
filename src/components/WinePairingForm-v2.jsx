@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react'
-import { Upload, Sparkles, Wine, TrendingUp } from 'lucide-react'
+import { Upload, Sparkles, Wine, TrendingUp, BookmarkCheck, Bookmark } from 'lucide-react'
 import {
   procurarPratoHistorico,
-  guardarSugestao
+  guardarSugestao,
+  atualizarPratoHistorico
 } from '../services/fbHistoricoPratos'
 import { procurarMatchGarrafeira, listarGarrafeira } from '../services/fbGarrafeira'
 
@@ -17,6 +18,9 @@ export default function WinePairingForm({ userId }) {
   const [error, setError] = useState(null)
   const [fromCache, setFromCache] = useState(false)
   const [stats, setStats] = useState(null)
+  const [savedId, setSavedId] = useState(null)
+  const [saving, setSaving] = useState(false)
+  const [savedOk, setSavedOk] = useState(false)
   const fileInputRef = useRef(null)
 
   const handleImageUpload = (e) => {
@@ -42,6 +46,8 @@ export default function WinePairingForm({ userId }) {
     setError(null)
     setRecommendation(null)
     setFromCache(false)
+    setSavedId(null)
+    setSavedOk(false)
 
     try {
       // PASSO 1: PROCURAR NO HISTÓRICO (CACHE)
@@ -162,7 +168,7 @@ REGIÃO/ORIGEM: [Onde encontrar este vinho ou alternativas similares]`
 
       // PASSO 4: Guardar no histórico
       console.log('💾 Guardando no histórico...')
-      await guardarSugestao(userId, {
+      const docId = await guardarSugestao(userId, {
         prato: dish,
         budget: { min: budgetMin, max: budgetMax },
         vinhoGarrafeira: matchGarrafeira,
@@ -170,6 +176,7 @@ REGIÃO/ORIGEM: [Onde encontrar este vinho ou alternativas similares]`
         fotoPrato: imagePreview,
         custo: '€0.02'
       })
+      setSavedId(docId)
 
       setRecommendation(recommendationText)
       setFromCache(false)
@@ -178,6 +185,22 @@ REGIÃO/ORIGEM: [Onde encontrar este vinho ou alternativas similares]`
       setError(err.message || 'Erro ao analisar. Tenta novamente.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const guardarRefeicao = async () => {
+    if (!savedId) return
+    setSaving(true)
+    try {
+      await atualizarPratoHistorico(userId, savedId, {
+        confirmado_pelo_utilizador: true,
+        data_refeicao: new Date().toISOString().split('T')[0]
+      })
+      setSavedOk(true)
+    } catch (err) {
+      console.error('Erro ao guardar refeição:', err)
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -339,6 +362,36 @@ REGIÃO/ORIGEM: [Onde encontrar este vinho ou alternativas similares]`
             className="whitespace-pre-wrap text-base leading-relaxed"
           >
             {typeof recommendation === 'string' ? recommendation : JSON.stringify(recommendation, null, 2)}
+          </div>
+
+          {/* Botão Guardar Refeição */}
+          <div className="mt-6 pt-6" style={{ borderTop: '1px solid rgba(212, 175, 55, 0.2)' }}>
+            {savedOk ? (
+              <div className="flex items-center gap-2 p-4 rounded-xl" style={{ background: 'rgba(34, 197, 94, 0.15)', border: '1px solid rgba(34, 197, 94, 0.4)' }}>
+                <BookmarkCheck size={20} style={{ color: '#4ade80' }} />
+                <p style={{ color: '#4ade80', fontFamily: 'Lora, serif', margin: 0 }}>
+                  Refeição guardada no histórico! 🍷
+                </p>
+              </div>
+            ) : (
+              <button
+                onClick={guardarRefeicao}
+                disabled={saving}
+                className="w-full py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
+                style={{
+                  background: 'rgba(212, 175, 55, 0.15)',
+                  border: '1px solid rgba(212, 175, 55, 0.4)',
+                  color: '#d4af37',
+                  fontFamily: 'Lora, serif',
+                  fontWeight: '600',
+                  cursor: saving ? 'not-allowed' : 'pointer',
+                  opacity: saving ? 0.6 : 1
+                }}
+              >
+                <Bookmark size={18} />
+                {saving ? 'A guardar...' : 'Guardar esta Refeição no Histórico'}
+              </button>
+            )}
           </div>
         </div>
       )}
