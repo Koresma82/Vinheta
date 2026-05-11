@@ -209,8 +209,8 @@ REGIÃO/ORIGEM: [Onde encontrar este vinho ou alternativas similares]`
       {/* Title */}
       <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '1rem' }}>
-          <img src="/logo.png" alt="Vinheta" style={{ height: '48px', width: '48px', objectFit: 'contain' }} />
-          <h1 style={{ fontFamily: 'Playfair Display, serif', color: '#d4af37', fontSize: '2.5rem', fontWeight: 'bold', margin: 0 }}>
+          <img src="/logo.png" alt="Vinheta" style={{ height: '80px', width: '80px', objectFit: 'contain' }} />
+          <h1 style={{ fontFamily: 'Playfair Display, serif', color: '#d4af37', fontSize: '3rem', fontWeight: 'bold', margin: 0 }}>
             Vinheta
           </h1>
         </div>
